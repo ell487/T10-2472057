@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RandomBox-2472057</title>
+    <script src="jquery.min.js"></script>
+    <style>
+        .container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            border: 1px solid red;
+            margin: 50px auto;
+        }
+
+        .kotak {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: green;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="kotak"></div>
+</div>
+
+<script>
+    function pindah() {
+        const maxWidth = 800 - 100;  
+        const maxHeight = 600 - 100; 
+
+        const left = Math.random() * maxWidth;
+        const top = Math.random() * maxHeight;
+
+        $('.kotak').fadeOut(500, function () {
+            $(this).css({
+                left: left + "px",
+                top: top + "px"
+            }).fadeIn(500);
+        });
+
+        setTimeout(pindah, 2000); 
+    }
+
+    $(document).ready(function () {
+        pindah();
+    });
+</script>
+
+</body>
+</html>
