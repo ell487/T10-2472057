@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <script src="jquery.min.js"></script>
+   <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: Arial, sans-serif;
+    }
+    .content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    table {
+        border: 3px solid black;
+        border-collapse: collapse;
+    }
+    .kotak {
+        width: 75px;
+        height: 75px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    .finish, .start {
+        height: 75px;
+        text-align: center;
+        padding: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        background-color: white;
+        transition: background-color 0.3s;
+    }
+    .finish {
+        border-bottom: 3px solid gray;
+    }
+    .start {
+        border-top: 3px solid gray;
+    }
+    .salah {
+        background-color: gray;
+        border: 3px dashed gray;
+    }
+
+    .dialog-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.0);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    .dialog-box {
+        background-color: white;
+        padding: 30px 15px;
+        border: 1px solid #aaa;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        font-family: sans-serif;
+        font-size: 13px;
+        max-width: 300px;
+        
+    }
+
+    .big-dialog {
+    padding: 50px 30px;
+    font-size: 20px;
+    max-width: 400px;
+    text-align: center;
+    font-weight: bold;
+    width: 3500px;
+    }
+
+    .lose-dialog {
+    font-size: 16px;
+    text-align: center;
+}
+
+
+    
+    .dialog-message {
+        margin-bottom: 10px;
+    }
+    .dialog-button {
+        padding: 3px 10px;
+        font-size: 13px;
+    }
+    .dialog-checkbox {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    .dialog-checkbox input {
+        margin-right: 5px;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <table>
+                <tr>
+                    <td colspan="6" class="finish"><h1>FINISH</h1></td>
+                </tr>
+                <tr>
+                    <td class="kotak benar"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                </tr>
+                <tr>
+                    <td class="kotak benar"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                </tr>
+                <tr>
+                    <td class="kotak benar"></td>
+                    <td class="kotak benar"></td>
+                    <td class="kotak benar"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                </tr>
+                <tr>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak benar"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                </tr>
+                <tr>
+                    <td class="kotak salah"></td>
+                    <td class="kotak salah"></td>
+                    <td class="kotak benar"></td>
+                    <td class="kotak benar"></td>
+                    <td class="kotak benar"></td>
+                    <td class="kotak benar"></td>
+                </tr>
+                <tr>
+                    <td colspan="6" class="start"><h1>START</h1></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        let isPlaying = false;
+        let correctPath = true;
+        let dialogShown = false;
+
+      function showDialog(message, isWin) {
+            if (dialogShown) return;
+            dialogShown = true;
+
+            let checkboxHTML = '';
+            let extraClass = isWin ? 'big-dialog' : 'lose-dialog';
+
+            if (!isWin) {
+                checkboxHTML = `
+                    <div class="dialog-checkbox">
+                        <input type="checkbox" id="prevent-dialogs">
+                        <label for="prevent-dialogs">Prevent this page from creating additional dialogs</label>
+                    </div>
+                `;
+            }
+
+            $('body').append(`
+                <div class="dialog-overlay">
+                    <div class="dialog-box ${extraClass}">
+                        <div class="dialog-message">${message}</div>
+                        ${checkboxHTML}
+                        <button class="dialog-button">OK</button>
+                    </div>
+                </div>
+            `);
+
+            $('.dialog-button').click(function() {
+                if (!isWin && $('#prevent-dialogs').is(':checked')) {
+                    $('.salah').off('hover');
+                }
+                $('.dialog-overlay').remove();
+                dialogShown = false;
+            });
+        }
+
+
+        $(".start").hover(
+            function() {
+                $(this).css("background-color", "#0099FF");
+                $(this).find("h1").css("color", "white");
+                isPlaying = true;
+                correctPath = true;
+                dialogShown = false;
+            },
+            function() {
+                $(this).css("background-color", "white");
+                $(this).find("h1").css("color", "black");
+            }
+        );
+
+        $(".finish").hover(
+            function() {
+                $(this).css("background-color", "#FFCC00");
+                if (isPlaying && correctPath && !dialogShown) {
+                    showDialog("congrats!", true);
+                    isPlaying = false;
+                }
+            },
+            function() {
+                $(this).css("background-color", "white");
+            }
+        );
+
+        $(".benar").hover(
+            function() {
+                if (isPlaying) {
+                    $(this).css("background-color", "green");
+                }
+            },
+            function() {
+                if (isPlaying) {
+                    $(this).css("background-color", "white");
+                }
+            }
+        );
+
+        $(".salah").hover(
+            function() {
+                if (isPlaying && !dialogShown) {
+                    $(this).css("background-color", "red");
+                    showDialog("you lose!", false);
+                    correctPath = false;
+                    isPlaying = false;
+                }
+            },
+            function() {
+                if (isPlaying) {
+                    $(this).css("background-color", "gray");
+                }
+            }
+        );
+    });
+</script>
+
+</body>
+</html>
